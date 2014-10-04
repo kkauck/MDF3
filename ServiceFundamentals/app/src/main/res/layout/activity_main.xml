@@ -1,7 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:id="@+id/main_container"
+    android:layout_height="fill_parent"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
@@ -9,53 +10,4 @@
     tools:context=".MainActivity"
     android:background="#0C090A">
 
-    <ImageButton
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:id="@+id/previous"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="39dp"
-        android:background="@drawable/ic_stat_av_previous" />
-
-    <ImageButton
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:id="@+id/stop"
-        android:layout_toEndOf="@+id/previous"
-        android:layout_alignBottom="@+id/previous"
-        android:layout_toRightOf="@+id/previous"
-        android:layout_marginLeft="31dp"
-        android:background="@drawable/ic_stat_av_stop" />
-
-    <ImageButton
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:id="@+id/play"
-        android:layout_toEndOf="@+id/stop"
-        android:background="@drawable/ic_stat_av_play"
-        android:layout_alignTop="@+id/stop"
-        android:layout_toRightOf="@+id/stop"
-        android:layout_marginLeft="31dp" />
-
-    <ImageButton
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:id="@+id/pause"
-        android:layout_alignTop="@+id/play"
-        android:layout_toRightOf="@+id/play"
-        android:layout_toEndOf="@+id/play"
-        android:layout_marginLeft="30dp"
-        android:background="@drawable/ic_stat_av_pause" />
-
-    <ImageButton
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:id="@+id/next"
-        android:background="@drawable/ic_stat_av_next"
-        android:layout_alignTop="@+id/pause"
-        android:layout_toRightOf="@+id/pause"
-        android:layout_toEndOf="@+id/pause"
-        android:layout_marginLeft="26dp" />
 </RelativeLayout>

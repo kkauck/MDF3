@@ -1,36 +1,71 @@
 package com.example.kyle.servicefundamentals;
 
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+
+import Fragments.UIFragment;
 
 
 public class MainActivity extends Activity {
+
+    public static final int NOTIFICATION = 0x010101;
+    public static final int NOTIFY_LAUNCH = 0x020101;
+    public static String title;
+    private NotificationManager mNoteManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-    }
 
+        if (savedInstanceState == null){
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
+            UIFragment frag = UIFragment.newInstance();
+            getFragmentManager().beginTransaction().replace(R.id.main_container, frag, UIFragment.TAG).commit();
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
         }
-        return super.onOptionsItemSelected(item);
+
+        /*Intent newIntent = new Intent(this, MainActivity.class);
+
+        PendingIntent intent = PendingIntent.getActivity(this, NOTIFY_LAUNCH, newIntent, 0);
+
+        mNoteManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+        builder.setContentIntent(intent);
+        builder.setSmallIcon(R.drawable.ic_launcher);
+        builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher));
+        builder.setContentTitle("Custom Music");
+        builder.setContentText(title);
+        builder.setAutoCancel(true);
+        mNoteManager.notify(NOTIFICATION, builder.build());*/
+
     }
+
+    /*public static void setTitle (String _title){
+
+        title = _title;
+
+    }
+
+    public void createNotification(){
+
+        Intent newIntent = new Intent(this, MainActivity.class);
+
+        PendingIntent intent = PendingIntent.getActivity(this, NOTIFY_LAUNCH, newIntent, 0);
+
+        mNoteManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+        builder.setContentIntent(intent);
+        builder.setSmallIcon(R.drawable.ic_launcher);
+        builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher));
+        builder.setContentTitle("Custom Music");
+        builder.setContentText(title);
+        builder.setAutoCancel(true);
+        mNoteManager.notify(NOTIFICATION, builder.build());
+
+    }*/
+
 }
