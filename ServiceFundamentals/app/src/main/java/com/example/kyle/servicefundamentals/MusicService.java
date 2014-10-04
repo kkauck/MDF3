@@ -31,12 +31,13 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     MediaPlayer mMediaPlayer;
     boolean mResumed;
     boolean mReady;
+    boolean mTesting = true;
     public boolean mStartAgain;
     int mPosition;
     BoundService mBinder;
     Uri mSongOne, mSongTwo, mSongThree, mSongFour, mSongFive;
-    ArrayList <Uri> songList = new ArrayList<Uri>();
-    public int song;
+    ArrayList <Uri> mSongList = new ArrayList<Uri>();
+    public int mSong = 0;
 
     @Override
     public void onCreate() {
@@ -52,11 +53,11 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         mSongFour = Uri.parse("android.resource://" + getPackageName() + "/raw/mr_fancy_pants");
         mSongFive = Uri.parse("android.resource://" + getPackageName() + "/raw/tom_cruise_crazy");
 
-        songList.add(mSongOne);
-        songList.add(mSongTwo);
-        songList.add(mSongThree);
-        songList.add(mSongFour);
-        songList.add(mSongFive);
+        mSongList.add(mSongOne);
+        mSongList.add(mSongTwo);
+        mSongList.add(mSongThree);
+        mSongList.add(mSongFour);
+        mSongList.add(mSongFive);
 
         Toast.makeText(this, "Music Service Created", Toast.LENGTH_SHORT).show();
 
@@ -65,9 +66,11 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+        mTesting = UIFragment.mRestart;
+
         if (mMediaPlayer != null){
 
-            Uri thisSong = songList.get(this.song);
+            Uri thisSong = mSongList.get(this.mSong);
 
             MediaMetadataRetriever info = new MediaMetadataRetriever();
             info.setDataSource(this, thisSong);
@@ -75,6 +78,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
             UIFragment.mTitle.setText(title);
             mTitle = title;
+
+        } else if (mMediaPlayer == null && mTesting == false) {
+
+            onPlay();
 
         }
 
@@ -95,6 +102,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         if (mMediaPlayer != null) {
 
+            UIFragment.mRestart = false;
             mMediaPlayer.stop();
             mMediaPlayer.reset();
             mMediaPlayer.release();
@@ -108,8 +116,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     public void onPlay(){
 
-        song = 0;
-
         if (mMediaPlayer == null){
 
             mMediaPlayer = new MediaPlayer();
@@ -117,7 +123,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
             try {
 
-                Uri thisSong = songList.get(this.song);
+                Uri thisSong = mSongList.get(this.mSong);
                 mMediaPlayer.setDataSource(this, thisSong);
                 mMediaPlayer.setOnPreparedListener(this);
                 mMediaPlayer.prepare();
@@ -129,24 +135,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
                         release();
                         nextSong();
-
-                        /*song = (song + 1) % songList.size();
-                        Uri upcoming = songList.get(song);
-
-                        try {
-
-                            mp.reset();
-                            mp.setDataSource(MusicService.this, upcoming);
-                            mp.setOnPreparedListener(MusicService.this);
-                            mp.prepare();
-                            mp.start();
-
-
-                        } catch (Exception e){
-
-                            e.printStackTrace();
-
-                        }*/
 
                     }
                 });
@@ -166,6 +154,42 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             mMediaPlayer.start();
 
             Toast.makeText(this, "Music Service Still Running", Toast.LENGTH_SHORT).show();
+
+        }
+
+    }
+
+    public void playSkippedSong(){
+
+        mMediaPlayer.release();
+
+        mMediaPlayer = new MediaPlayer();
+        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+        try {
+
+            Uri thisSong = mSongList.get(this.mSong);
+            mMediaPlayer.setDataSource(this, thisSong);
+            mMediaPlayer.setOnPreparedListener(this);
+            mMediaPlayer.prepare();
+            mMediaPlayer.start();
+            mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+
+                    release();
+                    nextSong();
+
+                }
+            });
+
+        } catch (IOException e){
+
+            e.printStackTrace();
+
+            mMediaPlayer.release();
+            mMediaPlayer = null;
 
         }
 
@@ -192,10 +216,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     private void nextSong(){
 
-        Uri readdSong = songList.get(0);
-        songList.add(readdSong);
+        Uri readSong = mSongList.get(0);
+        mSongList.add(readSong);
 
-        songList.remove(0);
+        mSongList.remove(0);
         mPosition = 0;
         onPlay();
 
@@ -240,7 +264,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         mReady = true;
 
-        Uri songTitle = songList.get(song);
+        Uri songTitle = mSongList.get(mSong);
 
         MediaMetadataRetriever info = new MediaMetadataRetriever();
         info.setDataSource(this, songTitle);
@@ -248,8 +272,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         UIFragment.mTitle.setText(title);
         mTitle = title;
-
-        //((MainActivity) getApplicationContext()).createNotification(title);
 
         if (mp == mMediaPlayer){
 
@@ -263,8 +285,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         PendingIntent intent = PendingIntent.getActivity(this, NOTIFY_LAUNCH, newIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        //mNoteManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         builder.setContentIntent(intent);
         builder.setTicker(title);
@@ -274,11 +294,45 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         builder.setContentTitle("Currently Playing:");
         builder.setContentText(mTitle);
         builder.setAutoCancel(true);
-        //mNoteManager.notify(NOTIFICATION, builder.build());
 
         mNoteManager = builder.build();
 
         startForeground(NOTIFICATION_ID, mNoteManager);
 
     }
+
+    public void skipSong() {
+
+        //This increments the song int which is tied to my ArrayList and will increment to the correct index in the array
+        mSong++;
+
+        if (mSong <= mSongList.size() - 1){
+
+            //Calls for my method that will correctly release the original media player and then create a new one for the current song that is playing.
+            playSkippedSong();
+
+        } else {
+
+            mSong = mSong - 1;
+
+        }
+
+    }
+
+    public void backwards(){
+
+        mSong--;
+
+        if (mSong >= 0){
+
+            playSkippedSong();
+
+        } else if (mSong < 0) {
+
+            mSong = 0;
+
+        }
+
+    }
+
 }

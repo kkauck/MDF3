@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ public class UIFragment extends Fragment implements View.OnClickListener, Servic
     MusicService mMusic;
     boolean mServiceBound;
     public static TextView mTitle;
+    public static boolean mRestart = true;
 
     public static UIFragment newInstance(){
 
@@ -42,6 +44,16 @@ public class UIFragment extends Fragment implements View.OnClickListener, Servic
         view.findViewById(R.id.forward).setOnClickListener(this);
         view.findViewById(R.id.play).setOnClickListener(this);
         mTitle = (TextView) view.findViewById(R.id.title);
+
+        if (mRestart != false) {
+
+            Log.i("Hello", " Peter");
+
+        } else {
+
+            Log.i("Hello", " Stewie");
+
+        }
 
         if (!mServiceBound){
 
@@ -75,6 +87,8 @@ public class UIFragment extends Fragment implements View.OnClickListener, Servic
 
         } else if (v.getId() == R.id.stop){
 
+            //mMusic.stopMusic();
+
             if (mServiceBound){
 
                 getActivity().unbindService(this);
@@ -92,6 +106,22 @@ public class UIFragment extends Fragment implements View.OnClickListener, Servic
             if (mMusic != null){
 
                 mMusic.onPause();
+
+            }
+
+        } else if (v.getId() == R.id.forward){
+
+            if (mMusic != null){
+
+                mMusic.skipSong();
+
+            }
+
+        } else if (v.getId() == R.id.previous){
+
+            if (mMusic != null){
+
+                mMusic.backwards();
 
             }
 
