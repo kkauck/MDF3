@@ -7,12 +7,10 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.kyle.servicefundamentals.MusicService;
 import com.example.kyle.servicefundamentals.R;
@@ -44,16 +42,6 @@ public class UIFragment extends Fragment implements View.OnClickListener, Servic
         view.findViewById(R.id.forward).setOnClickListener(this);
         view.findViewById(R.id.play).setOnClickListener(this);
         mTitle = (TextView) view.findViewById(R.id.title);
-
-        if (mRestart != false) {
-
-            Log.i("Hello", " Peter");
-
-        } else {
-
-            Log.i("Hello", " Stewie");
-
-        }
 
         if (!mServiceBound){
 
@@ -94,8 +82,6 @@ public class UIFragment extends Fragment implements View.OnClickListener, Servic
                 getActivity().unbindService(this);
                 mServiceBound = false;
                 mMusic = null;
-
-                Toast.makeText(getActivity(), "You Are Unbound", Toast.LENGTH_SHORT).show();
 
             }
 

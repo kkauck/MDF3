@@ -14,7 +14,6 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,10 +23,7 @@ import Fragments.UIFragment;
 public class MusicService extends Service implements MediaPlayer.OnPreparedListener {
 
     public static final int NOTIFY_LAUNCH = 0x020101;
-    private Notification mNoteManager;
     public String mTitle;
-    private static final String SAVED_POSITION = "MusicService.SAVED_POSITION";
-    private static int NOTIFICATION_ID = 0x010101;
     MediaPlayer mMediaPlayer;
     boolean mResumed;
     boolean mReady;
@@ -47,19 +43,19 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         mReady = mResumed = false;
         mBinder = new BoundService();
 
+        //Sets all my song URIs
         mSongOne = Uri.parse("android.resource://" + getPackageName() + "/raw/i_feel_fantastic");
         mSongTwo = Uri.parse("android.resource://" + getPackageName() + "/raw/chiron_beta_prime");
         mSongThree = Uri.parse("android.resource://" + getPackageName() + "/raw/creepy_doll");
         mSongFour = Uri.parse("android.resource://" + getPackageName() + "/raw/mr_fancy_pants");
         mSongFive = Uri.parse("android.resource://" + getPackageName() + "/raw/tom_cruise_crazy");
 
+        //Adds each song into an array for playing
         mSongList.add(mSongOne);
         mSongList.add(mSongTwo);
         mSongList.add(mSongThree);
         mSongList.add(mSongFour);
         mSongList.add(mSongFive);
-
-        Toast.makeText(this, "Music Service Created", Toast.LENGTH_SHORT).show();
 
     }
 
@@ -70,6 +66,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         if (mMediaPlayer != null){
 
+            //This will set me song title for the UI
             Uri thisSong = mSongList.get(this.mSong);
 
             MediaMetadataRetriever info = new MediaMetadataRetriever();
@@ -79,7 +76,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             UIFragment.mTitle.setText(title);
             mTitle = title;
 
-        } else if (mMediaPlayer == null && mTesting == false) {
+        } else if (mMediaPlayer == null && !mTesting) {
 
             onPlay();
 
@@ -91,8 +88,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         }
 
-        Toast.makeText(this, "Music Service Running", Toast.LENGTH_SHORT).show();
-
         return Service.START_NOT_STICKY;
 
     }
@@ -102,6 +97,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         if (mMediaPlayer != null) {
 
+            //This will save a boolean that is used for determining if music was paused or needs to start playing again, as well as stops the media player and then stops the service from running
             UIFragment.mRestart = false;
             mMediaPlayer.stop();
             mMediaPlayer.reset();
@@ -118,11 +114,13 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         if (mMediaPlayer == null){
 
+            //Creates a new media player
             mMediaPlayer = new MediaPlayer();
             mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
             try {
 
+                //Prepares the media player by getting the correct song from the array playlist
                 Uri thisSong = mSongList.get(this.mSong);
                 mMediaPlayer.setDataSource(this, thisSong);
                 mMediaPlayer.setOnPreparedListener(this);
@@ -133,6 +131,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                     @Override
                     public void onCompletion(MediaPlayer mp) {
 
+                        //Calls two methods to first release the media player and then start with a new song
                         release();
                         nextSong();
 
@@ -150,15 +149,15 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         } else if (mMediaPlayer != null){
 
+            //If music was paused then the media player will seek to the saved position
             mMediaPlayer.seekTo(mPosition);
             mMediaPlayer.start();
-
-            Toast.makeText(this, "Music Service Still Running", Toast.LENGTH_SHORT).show();
 
         }
 
     }
 
+    //This method is called when the user skips to a new song, the original media player is released and a new one is created for the new song
     public void playSkippedSong(){
 
         mMediaPlayer.release();
@@ -195,6 +194,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     }
 
+    //This is called when a song is done and the next one needs to begin playing
     private void release(){
 
         if (mMediaPlayer == null){
@@ -214,8 +214,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     }
 
+    //This will be called after the release so that the user is able to continue listening to music
     private void nextSong(){
 
+        //Before being removed from the list the current song is saved again to the list at the back so that it can be looped back through when all five songs are done playing.
         Uri readSong = mSongList.get(0);
         mSongList.add(readSong);
 
@@ -229,18 +231,18 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         mResumed = false;
 
+        //This will allow the user to pause the current song, saving the songs position to easily resume playing
         if (mMediaPlayer != null && mMediaPlayer.isPlaying()){
 
             mMediaPlayer.pause();
 
             mPosition = mMediaPlayer.getCurrentPosition();
 
-            Toast.makeText(this, "You Are Paused", Toast.LENGTH_SHORT).show();
-
         }
 
     }
 
+    //Used to bind my services
     public class BoundService extends Binder {
 
         public MusicService getService(){
@@ -254,7 +256,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     @Override
     public IBinder onBind(Intent intent) {
 
-        Toast.makeText(this, "You Are Bound", Toast.LENGTH_SHORT).show();
         return mBinder;
 
     }
@@ -280,6 +281,16 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         }
 
+        notificationGen();
+
+    }
+
+    //Called to create a notification when the the user plays music and anytime a new song begins to play
+    public void notificationGen(){
+
+        int NOTIFICATION_ID = 0x010101;
+        Notification mNoteManager;
+
         Intent newIntent = new Intent(this, MainActivity.class);
         newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
@@ -287,10 +298,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         builder.setContentIntent(intent);
-        builder.setTicker(title);
+        builder.setTicker(mTitle);
         builder.setOngoing(true);
-        builder.setSmallIcon(R.drawable.ic_launcher);
-        builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher));
+        builder.setSmallIcon(R.drawable.ic_stat_av_play_over_video);
+        builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_stat_av_play_over_video));
         builder.setContentTitle("Currently Playing:");
         builder.setContentText(mTitle);
         builder.setAutoCancel(true);
