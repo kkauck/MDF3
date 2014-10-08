@@ -12,28 +12,44 @@ import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import Fragments.UIFragment;
 
 public class MusicService extends Service implements MediaPlayer.OnPreparedListener {
 
-    public static final int NOTIFY_LAUNCH = 0x020101;
     public String mTitle;
     MediaPlayer mMediaPlayer;
-    boolean mResumed;
-    boolean mReady;
-    boolean mTesting = true;
-    public boolean mStartAgain;
-    int mPosition;
     BoundService mBinder;
     Uri mSongOne, mSongTwo, mSongThree, mSongFour, mSongFive;
     ArrayList <Uri> mSongList = new ArrayList<Uri>();
+
+    //Boolean Variables
+    boolean mResumed;
+    boolean mReady;
+    boolean mTesting = true;
+    boolean mShuffleSongs = false;
+    public boolean mStartAgain;
+
+    //Handler for seek bar updates
+    private Handler mHandler = new Handler();
+
+    //Number Variables
+    private double songStart = 0;
+    private double songStop = 0;
+    private Random mShuffleInt;
     public int mSong = 0;
+    int mPosition;
+    public static final int NOTIFY_LAUNCH = 0x020101;
+
 
     @Override
     public void onCreate() {
@@ -42,6 +58,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         mReady = mResumed = false;
         mBinder = new BoundService();
+        mShuffleInt = new Random();
 
         //Sets all my song URIs
         mSongOne = Uri.parse("android.resource://" + getPackageName() + "/raw/i_feel_fantastic");
@@ -73,6 +90,12 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             info.setDataSource(this, thisSong);
             String title = info.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
 
+            songStop = mMediaPlayer.getDuration();
+
+            UIFragment.mDuration.setMax((int) songStop);
+
+            mHandler.postDelayed(songUpdate, 100);
+
             UIFragment.mTitle.setText(title);
             mTitle = title;
 
@@ -99,6 +122,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
             //This will save a boolean that is used for determining if music was paused or needs to start playing again, as well as stops the media player and then stops the service from running
             UIFragment.mRestart = false;
+            UIFragment.mSwitchStatus = mShuffleSongs;
+            mHandler.removeCallbacks(songUpdate);
             mMediaPlayer.stop();
             mMediaPlayer.reset();
             mMediaPlayer.release();
@@ -112,7 +137,21 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     public void onPlay(){
 
-        if (mMediaPlayer == null){
+        if (mShuffleSongs) {
+
+            int nextSong = mSong;
+
+            while (nextSong == mSong) {
+
+                nextSong = mShuffleInt.nextInt(mSongList.size());
+
+            }
+
+            mSong = nextSong;
+
+        }
+
+            if (mMediaPlayer == null){
 
             //Creates a new media player
             mMediaPlayer = new MediaPlayer();
@@ -271,6 +310,21 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         info.setDataSource(this, songTitle);
         String title = info.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
 
+        songStart = mp.getCurrentPosition();
+        songStop = mp.getDuration();
+
+        mHandler.postDelayed(songUpdate, 100);
+
+        String musicTime = (String.format("%d Minutes, %d Seconds",
+                TimeUnit.MILLISECONDS.toMinutes((long) songStop),
+                TimeUnit.MILLISECONDS.toSeconds((long) songStop) -
+                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) songStop)))
+        );
+
+        Toast.makeText(this, "Current Song Time Is: " + musicTime, Toast.LENGTH_SHORT).show();
+
+        UIFragment.mDuration.setMax((int) songStop);
+
         UIFragment.mTitle.setText(title);
         mTitle = title;
 
@@ -284,6 +338,19 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         notificationGen();
 
     }
+
+    private Runnable songUpdate = new Runnable() {
+
+        @Override
+        public void run() {
+
+            songStart = mMediaPlayer.getCurrentPosition();
+            UIFragment.mDuration.setProgress((int) songStart);
+            mHandler.postDelayed(this, 100);
+
+        }
+
+    };
 
     //Called to create a notification when the the user plays music and anytime a new song begins to play
     public void notificationGen(){
@@ -315,16 +382,32 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public void skipSong() {
 
         //This increments the song int which is tied to my ArrayList and will increment to the correct index in the array
-        mSong++;
+        if (mShuffleSongs){
 
-        if (mSong <= mSongList.size() - 1){
+            int nextSong = mSong;
 
-            //Calls for my method that will correctly release the original media player and then create a new one for the current song that is playing.
-            playSkippedSong();
+            while (nextSong ==  mSong){
+
+                nextSong = mShuffleInt.nextInt(mSongList.size());
+
+            }
+
+            mSong = nextSong;
 
         } else {
 
-            mSong = mSong - 1;
+            mSong++;
+
+            if (mSong <= mSongList.size() - 1) {
+
+                //Calls for my method that will correctly release the original media player and then create a new one for the current song that is playing.
+                playSkippedSong();
+
+            } else {
+
+                mSong = mSong - 1;
+
+            }
 
         }
 
@@ -341,6 +424,21 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         } else if (mSong < 0) {
 
             mSong = 0;
+
+        }
+
+    }
+
+    public void shuffle(boolean _shuffle){
+
+        //if (mShuffleSongs) mShuffleSongs = false;
+        //else mShuffleSongs = true;
+
+        mShuffleSongs = _shuffle;
+
+        if (mShuffleSongs){
+
+            onPlay();
 
         }
 

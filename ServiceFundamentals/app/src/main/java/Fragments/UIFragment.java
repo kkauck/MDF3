@@ -10,6 +10,9 @@ import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
+import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.example.kyle.servicefundamentals.MusicService;
@@ -22,6 +25,10 @@ public class UIFragment extends Fragment implements View.OnClickListener, Servic
     boolean mServiceBound;
     public static TextView mTitle;
     public static boolean mRestart = true;
+    public static boolean mSwitchStatus;
+    public static SeekBar mDuration;
+    public static Switch mShuffle;
+    boolean mSwitchValue;
 
     public static UIFragment newInstance(){
 
@@ -42,6 +49,8 @@ public class UIFragment extends Fragment implements View.OnClickListener, Servic
         view.findViewById(R.id.forward).setOnClickListener(this);
         view.findViewById(R.id.play).setOnClickListener(this);
         mTitle = (TextView) view.findViewById(R.id.title);
+        mDuration = (SeekBar) view.findViewById(R.id.songSeek);
+        mShuffle = (Switch) view.findViewById(R.id.shuffle);
 
         if (!mServiceBound){
 
@@ -55,6 +64,32 @@ public class UIFragment extends Fragment implements View.OnClickListener, Servic
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+
+        super.onActivityCreated(savedInstanceState);
+
+        mShuffle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                if (isChecked){
+
+                    mSwitchValue = true;
+
+                } else {
+
+                    mSwitchValue = false;
+
+                }
+
+            }
+        });
+
+    }
+
+
+    @Override
     public void onClick(View v) {
 
         Intent intent = new Intent(getActivity(), MusicService.class);
@@ -63,12 +98,18 @@ public class UIFragment extends Fragment implements View.OnClickListener, Servic
 
             if (!mServiceBound){
 
+                boolean teating = mSwitchStatus;
+
                 getActivity().startService(intent);
                 getActivity().bindService(intent, this, Context.BIND_AUTO_CREATE);
 
             } else {
 
-                mMusic.onPlay();
+                if (mSwitchValue == true) {
+
+                    mMusic.shuffle(mSwitchValue);
+
+                }
 
             }
 
