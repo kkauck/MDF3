@@ -17,6 +17,8 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
 
+import com.example.kyle.servicefundamentals.data.MusicData;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
@@ -30,14 +32,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     MediaPlayer mMediaPlayer;
     BoundService mBinder;
     Uri mSongOne, mSongTwo, mSongThree, mSongFour, mSongFive;
-    Uri mAlbumOne, mAlbumTwo, mAlbumThree, mAlbumFour;
-    //ArrayList <Uri> mSongList = new ArrayList<Uri>();
-    ArrayList <Uri> mSongOneArray = new ArrayList<Uri>();
-    ArrayList <Uri> mSongTwoArray = new ArrayList<Uri>();
-    ArrayList <Uri> mSongThreeArray = new ArrayList<Uri>();
-    ArrayList <Uri> mSongFourArray = new ArrayList<Uri>();
-    ArrayList <Uri> mSongFiveArray = new ArrayList<Uri>();
     ArrayList <ArrayList> songStorage = new ArrayList<ArrayList>();
+    ArrayList <MusicData> mSongData = new ArrayList<MusicData>();
 
     //Boolean Variables
     boolean mResumed;
@@ -56,6 +52,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public int mSong = 0;
     int mPosition;
     public static final int NOTIFY_LAUNCH = 0x020101;
+    int mArtOne, mArtTwo, mArtThree, mArtFour;
 
 
     @Override
@@ -74,32 +71,17 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         mSongFour = Uri.parse("android.resource://" + getPackageName() + "/raw/mr_fancy_pants");
         mSongFive = Uri.parse("android.resource://" + getPackageName() + "/raw/tom_cruise_crazy");
 
-        //Sets all my Albumb URIs
-        mAlbumOne = Uri.parse("android.resource://" + getPackageName() + "/drawable/albumone.jpg");
-        mAlbumTwo = Uri.parse("android.resource://" + getPackageName() + "/drawable/albumtwo.jpg");
-        mAlbumThree = Uri.parse("android.resource://" + getPackageName() + "/drawable/albumthree.jpg");
-        mAlbumFour = Uri.parse("android.resource://" + getPackageName() + "/drawable/albumfour.jpg");
+        mArtOne = R.drawable.albumone;
+        mArtTwo = R.drawable.albumtwo;
+        mArtThree = R.drawable.albumthree;
+        mArtFour = R.drawable.ablumfour;
 
-        mSongOneArray.add(mSongOne);
-        mSongOneArray.add(mAlbumFour);
+        mSongData.add(new MusicData(mSongOne, mArtFour));
+        mSongData.add(new MusicData(mSongTwo, mArtOne));
+        mSongData.add(new MusicData(mSongThree, mArtThree));
+        mSongData.add(new MusicData(mSongFour, mArtThree));
+        mSongData.add(new MusicData(mSongFive, mArtTwo));
 
-        mSongTwoArray.add(mSongTwo);
-        mSongTwoArray.add(mAlbumOne);
-
-        mSongThreeArray.add(mSongThree);
-        mSongThreeArray.add(mAlbumThree);
-
-        mSongFourArray.add(mSongFour);
-        mSongFourArray.add(mAlbumThree);
-
-        mSongFiveArray.add(mSongFive);
-        mSongFiveArray.add(mAlbumTwo);
-
-        songStorage.add(mSongOneArray);
-        songStorage.add(mSongTwoArray);
-        songStorage.add(mSongThreeArray);
-        songStorage.add(mSongFourArray);
-        songStorage.add(mSongFiveArray);
 
     }
 
@@ -112,9 +94,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         if (mMediaPlayer != null){
 
             //This will set me song title for the UI
-            //Uri thisSong = mSongList.get(this.mSong);
-
             Uri thisSong = (Uri) songStorage.get(this.mSong).get(0);
+            int thisImage = mSongData.get(this.mSong).getSongArt();
 
             MediaMetadataRetriever info = new MediaMetadataRetriever();
             info.setDataSource(this, thisSong);
@@ -127,6 +108,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             mHandler.postDelayed(songUpdate, 100);
 
             UIFragment.mTitle.setText(title);
+            UIFragment.mImage.setImageResource(thisImage);
+
             mTitle = title;
 
         } else if (mMediaPlayer == null && !mTesting) {
@@ -174,7 +157,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
             while (nextSong == mSong) {
 
-                nextSong = mShuffleInt.nextInt(songStorage.size());
+                nextSong = mShuffleInt.nextInt(mSongData.size());
 
             }
 
@@ -191,8 +174,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             try {
 
                 //Prepares the media player by getting the correct song from the array playlist
-                //Uri thisSong = mSongList.get(this.mSong);
-                Uri thisSong = (Uri) songStorage.get(this.mSong).get(0);
+                Uri thisSong = mSongData.get(this.mSong).getSongTitle();
                 mMediaPlayer.setDataSource(this, thisSong);
                 mMediaPlayer.setOnPreparedListener(this);
                 mMediaPlayer.prepare();
@@ -237,7 +219,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
             while (nextSong == mSong) {
 
-                nextSong = mShuffleInt.nextInt(songStorage.size());
+                nextSong = mShuffleInt.nextInt(mSongData.size());
 
             }
 
@@ -252,9 +234,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         try {
 
-            //Uri thisSong = mSongList.get(this.mSong);
-            Uri thisSong = (Uri) songStorage.get(this.mSong).get(0);
-            mMediaPlayer.setDataSource(this, thisSong);
+            Uri songTitle = mSongData.get(mSong).getSongTitle();
+            mMediaPlayer.setDataSource(this, songTitle);
             mMediaPlayer.setOnPreparedListener(this);
             mMediaPlayer.prepare();
             mMediaPlayer.start();
@@ -304,14 +285,13 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     private void nextSong(int _song){
 
         //Before being removed from the list the current song is saved again to the list at the back so that it can be looped back through when all five songs are done playing.
-        //Uri readSong = mSongList.get(_song);
-        //mSongList.add(readSong);
+        Uri readSong = mSongData.get(_song).getSongTitle();
+        int readArt = mSongData.get(_song).getSongArt();
 
-        ArrayList readSong = songStorage.get(_song);
-        songStorage.add(readSong);
+        mSongData.add(new MusicData(readSong, readArt));
 
-        songStorage.remove(_song);
-        //mSongList.remove(_song);
+
+        mSongData.remove(_song);
         mPosition = 0;
         onPlay();
 
@@ -355,9 +335,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         mReady = true;
 
-        //Uri songTitle = mSongList.get(mSong);
+        Uri songTitle = mSongData.get(mSong).getSongTitle();
 
-        Uri songTitle = (Uri) songStorage.get(mSong).get(0);
+        int albumImage = mSongData.get(mSong).getSongArt();
 
         MediaMetadataRetriever info = new MediaMetadataRetriever();
         info.setDataSource(this, songTitle);
@@ -379,6 +359,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         UIFragment.mDuration.setMax((int) songStop);
 
         UIFragment.mTitle.setText(title);
+        UIFragment.mImage.setImageResource(albumImage);
+
         mTitle = title;
 
         if (mp == mMediaPlayer){
@@ -408,6 +390,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     //Called to create a notification when the the user plays music and anytime a new song begins to play
     public void notificationGen(){
 
+        int albumImage = mSongData.get(mSong).getSongArt();
+
         int NOTIFICATION_ID = 0x010101;
         Notification mNoteManager;
 
@@ -421,7 +405,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         builder.setTicker(mTitle);
         builder.setOngoing(true);
         builder.setSmallIcon(R.drawable.ic_stat_av_play_over_video);
-        builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_stat_av_play_over_video));
+        builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), albumImage));
         builder.setContentTitle("Currently Playing:");
         builder.setContentText(mTitle);
         builder.setAutoCancel(true);
@@ -443,7 +427,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
             mSong++;
 
-            if (mSong <= songStorage.size() - 1) {
+            if (mSong <= mSongData.size() - 1) {
 
                 //Calls for my method that will correctly release the original media player and then create a new one for the current song that is playing.
                 playSkippedSong();
@@ -483,9 +467,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     }
 
     public void shuffle(boolean _shuffle){
-
-        //if (mShuffleSongs) mShuffleSongs = false;
-        //else mShuffleSongs = true;
 
         mShuffleSongs = _shuffle;
 
