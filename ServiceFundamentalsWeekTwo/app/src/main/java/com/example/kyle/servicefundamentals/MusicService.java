@@ -94,7 +94,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         if (mMediaPlayer != null){
 
             //This will set me song title for the UI
-            Uri thisSong = (Uri) songStorage.get(this.mSong).get(0);
+            Uri thisSong = mSongData.get(this.mSong).getSongTitle();
             int thisImage = mSongData.get(this.mSong).getSongArt();
 
             MediaMetadataRetriever info = new MediaMetadataRetriever();
@@ -109,6 +109,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
             UIFragment.mTitle.setText(title);
             UIFragment.mImage.setImageResource(thisImage);
+            UIFragment.mShuffle.setChecked(mShuffleSongs);
 
             mTitle = title;
 
@@ -357,9 +358,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         Toast.makeText(this, "Current Song Time Is: " + musicTime, Toast.LENGTH_SHORT).show();
 
         UIFragment.mDuration.setMax((int) songStop);
-
         UIFragment.mTitle.setText(title);
         UIFragment.mImage.setImageResource(albumImage);
+
+        mShuffleSongs = UIFragment.mSwitchStatus;
 
         mTitle = title;
 
@@ -421,6 +423,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         //This increments the song int which is tied to my ArrayList and will increment to the correct index in the array
         if (mShuffleSongs){
 
+            mPosition = 0;
             playSkippedSong();
 
         } else {
@@ -430,6 +433,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             if (mSong <= mSongData.size() - 1) {
 
                 //Calls for my method that will correctly release the original media player and then create a new one for the current song that is playing.
+                mPosition = 0;
                 playSkippedSong();
 
             } else {
