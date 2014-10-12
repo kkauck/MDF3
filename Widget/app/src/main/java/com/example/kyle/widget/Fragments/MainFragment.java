@@ -79,15 +79,11 @@ public class MainFragment extends ListFragment {
 
         Intent detailView = new Intent(getActivity(), DetailView.class);
 
-        int arrayPosition = position;
-        mLoadedArray = ((MainActivity) getActivity()).getArray();
         mGameDetails = ((MainActivity) getActivity()).getArray().get(position);
 
         detailView.putExtra("game_details", mGameDetails);
-        detailView.putExtra("game_array", mLoadedArray);
-        detailView.putExtra("position", arrayPosition);
 
-        startActivityForResult(detailView, DETAILCODE);
+        startActivity(detailView);
 
     }
 

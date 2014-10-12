@@ -2,7 +2,6 @@
 
 package com.example.kyle.widget;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -47,8 +46,7 @@ public class CreateView extends Activity implements CreateFragment.gameDetails {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-        ActionBar getActionBar = getActionBar();
-        getActionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#31698A")));
+        getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#31698A")));
 
         return true;
 

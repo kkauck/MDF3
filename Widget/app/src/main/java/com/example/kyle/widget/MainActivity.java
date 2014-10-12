@@ -2,7 +2,6 @@
 
 package com.example.kyle.widget;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -49,8 +48,7 @@ public class MainActivity extends Activity implements MainFragment.gameDetails {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
 
-        ActionBar getActionBar = getActionBar();
-        getActionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#31698A")));
+        getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#31698A")));
 
         return true;
 
