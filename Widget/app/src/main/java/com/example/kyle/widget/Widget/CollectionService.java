@@ -12,7 +12,7 @@ public class CollectionService extends RemoteViewsService {
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
 
-        return new CollectionViewFactory(getApplicationContext(), ((MainActivity) getApplicationContext()).getArray());
+        return new CollectionViewFactory(getApplicationContext(), MainActivity.mGameDetails);
 
     }
 

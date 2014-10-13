@@ -18,25 +18,15 @@ public class CollectionViewFactory implements RemoteViewsService.RemoteViewsFact
     private ArrayList<DataHelper> mGames;
     private Context mContext;
 
-    public CollectionViewFactory(Context _context, ArrayList<DataHelper> _games){
+    public CollectionViewFactory(Context _context, ArrayList<DataHelper> _array){
 
         mContext = _context;
-        mGames = _games;
+        mGames = _array;
 
     }
 
     @Override
     public void onCreate() {
-
-    }
-
-    @Override
-    public void onDataSetChanged() {
-
-    }
-
-    @Override
-    public void onDestroy() {
 
     }
 
@@ -48,20 +38,9 @@ public class CollectionViewFactory implements RemoteViewsService.RemoteViewsFact
     }
 
     @Override
-    public RemoteViews getViewAt(int position) {
+    public long getItemId(int position) {
 
-        DataHelper helper = mGames.get(position);
-
-        RemoteViews itemView = new RemoteViews(mContext.getPackageName(), R.layout.widget_layout);
-        itemView.setTextViewText(R.id.widgetTitle, helper.getTitle());
-        itemView.setTextViewText(R.id.widgetPlatform, helper.getPlatform());
-        itemView.setTextViewText(R.id.widgetGenre, helper.getGenre());
-
-        Intent intent = new Intent();
-        intent.putExtra(CollectionProvider.EXTRA_ITEM, intent);
-        itemView.setOnClickFillInIntent(R.id.game_item, intent);
-
-        return itemView;
+        return ID_CONSTANT + position;
 
     }
 
@@ -73,16 +52,27 @@ public class CollectionViewFactory implements RemoteViewsService.RemoteViewsFact
     }
 
     @Override
-    public int getViewTypeCount() {
+    public RemoteViews getViewAt(int position) {
 
-        return 1;
+        DataHelper helper = mGames.get(position);
+
+        RemoteViews itemView = new RemoteViews(mContext.getPackageName(), R.layout.game_item);
+        itemView.setTextViewText(R.id.widgetTitle, helper.getTitle());
+        itemView.setTextViewText(R.id.widgetPlatform, helper.getPlatform());
+        itemView.setTextViewText(R.id.widgetGenre, helper.getGenre());
+
+        Intent intent = new Intent();
+        intent.putExtra("game_detail", intent);
+        itemView.setOnClickFillInIntent(R.id.game_item, intent);
+
+        return itemView;
 
     }
 
     @Override
-    public long getItemId(int position) {
+    public int getViewTypeCount() {
 
-        return ID_CONSTANT + position;
+        return 1;
 
     }
 
@@ -92,4 +82,18 @@ public class CollectionViewFactory implements RemoteViewsService.RemoteViewsFact
         return true;
 
     }
+
+    @Override
+    public void onDataSetChanged() {
+
+
+    }
+
+    @Override
+    public void onDestroy() {
+
+        mGames.clear();
+
+    }
+
 }
