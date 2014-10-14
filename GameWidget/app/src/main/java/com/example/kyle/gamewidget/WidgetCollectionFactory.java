@@ -13,6 +13,8 @@ public class WidgetCollectionFactory implements RemoteViewsService.RemoteViewsFa
 
     private ArrayList<DataHelper> mGames;
     private Context mContext;
+    DataHelper mDataHelper;
+    private static final String FILENAME = "games.txt";
 
     public WidgetCollectionFactory(Context context){
 
@@ -23,8 +25,6 @@ public class WidgetCollectionFactory implements RemoteViewsService.RemoteViewsFa
 
     @Override
     public void onCreate() {
-
-        mGames = MainActivity.mGameDetails;
 
 
     }
@@ -39,7 +39,6 @@ public class WidgetCollectionFactory implements RemoteViewsService.RemoteViewsFa
     @Override
     public void onDestroy() {
 
-        mGames.clear();
 
     }
 
@@ -63,6 +62,9 @@ public class WidgetCollectionFactory implements RemoteViewsService.RemoteViewsFa
         Intent intent = new Intent();
         intent.putExtra(WidgetProvider.EXTRA_ITEM, game);
         itemView.setOnClickFillInIntent(R.id.game_item, intent);
+
+        Intent createIntent = new Intent();
+        itemView.setOnClickFillInIntent(R.id.widgetCreate, createIntent);
 
         return itemView;
 

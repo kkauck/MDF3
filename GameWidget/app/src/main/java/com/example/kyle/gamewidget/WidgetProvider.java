@@ -10,6 +10,7 @@ import android.widget.RemoteViews;
 public class WidgetProvider extends AppWidgetProvider {
 
     public static final String ACTION_VIEW_DETAILS = "com.example.kyle.ACTION_VIEW_DETAILS";
+    public static final String ACTION_VIEW_CREATE = "com.example.kyle.ACTION_VIEW_CREATE";
     public static final String EXTRA_ITEM = "com.example.kyle.WidgetProvider.EXTRA_ITEM";
 
     @Override
@@ -29,6 +30,11 @@ public class WidgetProvider extends AppWidgetProvider {
             Intent detailIntent = new Intent(ACTION_VIEW_DETAILS);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, detailIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             widgetView.setPendingIntentTemplate(R.id.games_list, pendingIntent);
+
+            Intent createIntent = new Intent(ACTION_VIEW_CREATE);
+            PendingIntent createPIntent = PendingIntent.getBroadcast(context, 0, createIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            widgetView.setOnClickPendingIntent(R.id.widgetCreate, createPIntent);
 
             appWidgetManager.updateAppWidget(widgetID, widgetView);
 
@@ -52,6 +58,12 @@ public class WidgetProvider extends AppWidgetProvider {
                 context.startActivity(details);
 
             }
+
+        } else if (intent.getAction().equals(ACTION_VIEW_CREATE)){
+
+            Intent create = new Intent(context, CreateActivity.class);
+            create.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(create);
 
         }
 

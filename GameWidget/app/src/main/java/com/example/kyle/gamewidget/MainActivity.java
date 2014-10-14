@@ -71,6 +71,7 @@ public class MainActivity extends Activity implements MainFragment.gameDetails {
     public void loadData(){
 
         MainFragment frag = (MainFragment) getFragmentManager().findFragmentById(R.id.activity_main);
+        mGameDetails.clear();
 
         try {
 

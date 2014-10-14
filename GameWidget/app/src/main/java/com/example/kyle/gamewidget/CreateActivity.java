@@ -56,7 +56,6 @@ public class CreateActivity extends Activity implements CreateFragment.gameDetai
         if (item.getItemId() == android.R.id.home){
 
             saveContact();
-            updateWidget();
 
         }
 
@@ -68,7 +67,6 @@ public class CreateActivity extends Activity implements CreateFragment.gameDetai
     public void onBackPressed() {
 
         saveContact();
-        updateWidget();
 
     }
 
@@ -102,18 +100,11 @@ public class CreateActivity extends Activity implements CreateFragment.gameDetai
 
     }
 
-    private void updateWidget(){
-
-        Intent updateIntent = new Intent();
-        updateIntent.setAction(WidgetProvider.ACTION_VIEW_DETAILS);
-        updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetID);
-        sendBroadcast(updateIntent);
-
-
-    }
 
     @Override
     public void details(String _title, String _platform, String _genre) {
+
+        mGameDetails = MainActivity.mGameDetails;
 
         mGameDetails.add(new DataHelper(_title, _platform, _genre));
 
