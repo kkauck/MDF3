@@ -2,6 +2,7 @@ package com.example.kyle.gamewidget;
 
 import android.app.Activity;
 import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -56,6 +57,7 @@ public class CreateActivity extends Activity implements CreateFragment.gameDetai
         if (item.getItemId() == android.R.id.home){
 
             saveContact();
+            updateWidget();
 
         }
 
@@ -67,6 +69,7 @@ public class CreateActivity extends Activity implements CreateFragment.gameDetai
     public void onBackPressed() {
 
         saveContact();
+        updateWidget();
 
     }
 
@@ -97,6 +100,20 @@ public class CreateActivity extends Activity implements CreateFragment.gameDetai
 
         setResult(RESULT_OK, intent);
         finish();
+
+    }
+
+    private void updateWidget(){
+
+        AppWidgetManager widgetUpdate = AppWidgetManager.getInstance(getApplicationContext());
+
+        int [] widgetID = widgetUpdate.getAppWidgetIds(new ComponentName(getApplicationContext(), WidgetProvider.class));
+
+        if (widgetID.length > 0){
+
+            new WidgetProvider().onUpdate(getApplicationContext(), widgetUpdate, widgetID);
+
+        }
 
     }
 

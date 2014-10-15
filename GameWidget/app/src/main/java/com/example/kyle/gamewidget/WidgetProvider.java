@@ -20,6 +20,8 @@ public class WidgetProvider extends AppWidgetProvider {
 
             int widgetID = appWidgetIds[i];
 
+            appWidgetManager.notifyAppWidgetViewDataChanged(widgetID, R.id.games_list);
+
             Intent intent = new Intent(context, WidgetService.class);
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetID);
 
