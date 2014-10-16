@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import Fragments.UIFragment;
+import com.example.kyle.servicefundamentals.Fragments.UIFragment;
 
 public class MusicService extends Service implements MediaPlayer.OnPreparedListener {
 

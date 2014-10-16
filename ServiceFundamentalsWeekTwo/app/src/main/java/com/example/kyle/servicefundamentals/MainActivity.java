@@ -3,7 +3,7 @@ package com.example.kyle.servicefundamentals;
 import android.app.Activity;
 import android.os.Bundle;
 
-import Fragments.UIFragment;
+import com.example.kyle.servicefundamentals.Fragments.UIFragment;
 
 
 public class MainActivity extends Activity {

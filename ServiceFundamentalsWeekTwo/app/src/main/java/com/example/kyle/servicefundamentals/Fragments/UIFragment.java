@@ -1,4 +1,4 @@
-package Fragments;
+package com.example.kyle.servicefundamentals.Fragments;
 
 import android.app.Fragment;
 import android.content.ComponentName;
