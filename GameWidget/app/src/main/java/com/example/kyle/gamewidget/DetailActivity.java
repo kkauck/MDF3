@@ -28,6 +28,11 @@ public class DetailActivity extends Activity {
             Intent intent = getIntent();
             mGamesHelper = (DataHelper) intent.getSerializableExtra(EXTRA_ITEM);
 
+        } else {
+
+            Intent intent = getIntent();
+            mGamesHelper = (DataHelper) intent.getSerializableExtra(EXTRA_ITEM);
+
         }
 
     }
@@ -58,5 +63,11 @@ public class DetailActivity extends Activity {
 
         return mGamesHelper;
 
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        finish();
     }
 }

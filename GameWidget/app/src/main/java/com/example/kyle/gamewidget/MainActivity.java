@@ -1,7 +1,8 @@
 package com.example.kyle.gamewidget;
 
 import android.app.Activity;
-import android.content.Context;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -10,9 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 
@@ -29,14 +28,14 @@ public class MainActivity extends Activity implements MainFragment.gameDetails {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //mGameDetails.clear();
-
         if (savedInstanceState == null){
 
             MainFragment frag =  MainFragment.newInstance();
             getFragmentManager().beginTransaction().replace(R.id.activity_main, frag, MainFragment.TAG).commit();
 
         }
+
+        updateWidget();
 
     }
 
@@ -96,25 +95,15 @@ public class MainActivity extends Activity implements MainFragment.gameDetails {
 
     }
 
-    public void updateData(){
+    private void updateWidget(){
 
-        try {
+        AppWidgetManager widgetUpdate = AppWidgetManager.getInstance(getApplicationContext());
 
-            FileOutputStream output = openFileOutput(FILENAME, Context.MODE_PRIVATE);
-            ObjectOutputStream stream = new ObjectOutputStream(output);
+        int [] widgetID = widgetUpdate.getAppWidgetIds(new ComponentName(getApplicationContext(), WidgetProvider.class));
 
-            for (int i = 0; i < mGameDetails.size(); i++){
+        if (widgetID.length > 0){
 
-                mDataHelper = mGameDetails.get(i);
-                stream.writeObject(mDataHelper);
-
-            }
-
-            stream.close();
-
-        } catch (Exception e){
-
-            e.printStackTrace();
+            new WidgetProvider().onUpdate(getApplicationContext(), widgetUpdate, widgetID);
 
         }
 
