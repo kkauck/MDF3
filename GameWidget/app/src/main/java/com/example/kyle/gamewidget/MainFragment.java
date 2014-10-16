@@ -1,3 +1,5 @@
+//Kyle Kauck
+
 package com.example.kyle.gamewidget;
 
 import android.app.Activity;
@@ -8,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -58,8 +59,6 @@ public class MainFragment extends ListFragment {
         super.onActivityCreated(savedInstanceState);
         final View view = getView();
         assert view != null;
-
-        Toast.makeText(getActivity(), "This is working now my friend", Toast.LENGTH_SHORT).show();
 
         ((MainActivity) getActivity()).loadData();
 

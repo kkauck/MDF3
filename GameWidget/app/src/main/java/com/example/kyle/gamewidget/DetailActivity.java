@@ -1,3 +1,5 @@
+//Kyle Kauck
+
 package com.example.kyle.gamewidget;
 
 import android.app.Activity;
@@ -65,6 +67,7 @@ public class DetailActivity extends Activity {
 
     }
 
+    //Will finish the activity when the home button is pressed as well
     @Override
     protected void onStop() {
         super.onStop();

@@ -1,3 +1,5 @@
+//Kyle Kauck
+
 package com.example.kyle.gamewidget;
 
 import android.app.Activity;
@@ -95,6 +97,7 @@ public class MainActivity extends Activity implements MainFragment.gameDetails {
 
     }
 
+    //This will be called everytime the app is started up to keep the widget updated
     private void updateWidget(){
 
         AppWidgetManager widgetUpdate = AppWidgetManager.getInstance(getApplicationContext());

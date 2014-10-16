@@ -1,3 +1,5 @@
+//Kyle Kauck
+
 package com.example.kyle.gamewidget;
 
 import android.app.Activity;
@@ -103,6 +105,7 @@ public class CreateActivity extends Activity implements CreateFragment.gameDetai
 
     }
 
+    //This will be called to update the widget and keep it up to date when a new game is created
     private void updateWidget(){
 
         AppWidgetManager widgetUpdate = AppWidgetManager.getInstance(getApplicationContext());

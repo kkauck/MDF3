@@ -1,3 +1,5 @@
+//Kyle Kauck
+
 package com.example.kyle.gamewidget;
 
 import android.content.Context;
@@ -13,8 +15,6 @@ public class WidgetCollectionFactory implements RemoteViewsService.RemoteViewsFa
 
     private ArrayList<DataHelper> mGames;
     private Context mContext;
-    DataHelper mDataHelper;
-    private static final String FILENAME = "games.txt";
 
     public WidgetCollectionFactory(Context context){
 
@@ -54,15 +54,18 @@ public class WidgetCollectionFactory implements RemoteViewsService.RemoteViewsFa
 
         DataHelper game = mGames.get(position);
 
+        //This code will work with the actual listview of the widget for displaying the game information
         RemoteViews itemView = new RemoteViews(mContext.getPackageName(), R.layout.game_item);
         itemView.setTextViewText(R.id.widgetTitle, game.getTitle());
         itemView.setTextViewText(R.id.widgetPlatform, game.getPlatform());
         itemView.setTextViewText(R.id.widgetGenre, game.getGenre());
 
+        //This will setup the intent for when a game is actually clicked in the list
         Intent intent = new Intent();
         intent.putExtra(WidgetProvider.EXTRA_ITEM, game);
         itemView.setOnClickFillInIntent(R.id.game_item, intent);
 
+        //This sets up the intent for the click button
         Intent createIntent = new Intent();
         itemView.setOnClickFillInIntent(R.id.widgetCreate, createIntent);
 
