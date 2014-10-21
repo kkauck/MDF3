@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Mapping</string>
+    <string name="action_create">Add New Data</string>
+    <string name="name">Please Enter Activity Name Here</string>
+    <string name="time">Please Enter Date Here</string>
+    <string name="picture">Take Picture</string>
+    <string name="save">Save New Event</string>
+
+</resources>
