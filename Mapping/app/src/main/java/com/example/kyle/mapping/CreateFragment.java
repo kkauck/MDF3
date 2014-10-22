@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -27,10 +28,16 @@ public class CreateFragment extends Fragment {
 
     Uri mImageUri;
     ImageView mCreateImage;
+    double mCreateLat = DisplayMap.mLatitude;
+    double mCreateLong = DisplayMap.mLongitude;
+    private eventDetails mEventDetail;
+
+    TextView mName;
+    TextView mTime;
 
     public interface eventDetails{
 
-        public void details(String _name, String _time, Uri _genre);
+        public void details(String _name, String _time, String _image, double _lat, double _long);
 
     }
 
@@ -38,6 +45,23 @@ public class CreateFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         return inflater.inflate(R.layout.create_fragment, container, false);
+
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+
+        super.onAttach(activity);
+
+        if (activity instanceof eventDetails){
+
+            mEventDetail = (eventDetails) activity;
+
+        } else {
+
+            throw new IllegalArgumentException("Must Implement This!");
+
+        }
 
     }
 
@@ -50,6 +74,8 @@ public class CreateFragment extends Fragment {
         assert view != null;
 
         mCreateImage = (ImageView) view.findViewById(R.id.createImage);
+        mName = (TextView) view.findViewById(R.id.createName);
+        mTime = (TextView) view.findViewById(R.id.createDate);
 
         Button takePicture = (Button) view.findViewById(R.id.createPicture);
         takePicture.setOnClickListener(new View.OnClickListener() {
@@ -67,6 +93,28 @@ public class CreateFragment extends Fragment {
                 }
 
                 startActivityForResult(cameraIntent, REQUEST_TAKE_PICTURE);
+
+            }
+
+        });
+
+        Button saveContact = (Button) view.findViewById(R.id.createSave);
+        saveContact.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                String name = mName.getText().toString();
+                String time = mTime.getText().toString();
+                String image = mImageUri.toString();
+                double latitiude = mCreateLat;
+                double longitude = mCreateLong;
+
+                mEventDetail.details(name, time, image, latitiude, longitude);
+
+                mName.setText("");
+                mTime.setText("");
+                mCreateImage.setImageBitmap(null);
 
             }
 
