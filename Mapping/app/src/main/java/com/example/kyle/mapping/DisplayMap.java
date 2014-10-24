@@ -11,8 +11,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -22,19 +22,24 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
-public class DisplayMap extends MapFragment implements LocationListener {
+public class DisplayMap extends MapFragment implements LocationListener, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMapLongClickListener {
 
     GoogleMap mMap;
     LocationManager mLocManager;
 
     private static final int REQUEST_ENABLE_GPS = 0x01010;
+    private HashMap<String, DataHelper> mapInfo = new HashMap<String, DataHelper>();
+    private final String EXTRASTRING = "Event_Details";
 
     public static double mLatitude;
     public static double mLongitude;
 
     private ArrayList<DataHelper> mEventDetails;
     DataHelper mDataHelper;
+
+    int arrayLocation;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -45,8 +50,6 @@ public class DisplayMap extends MapFragment implements LocationListener {
 
         mEventDetails = MainActivity.mEventDetails;
 
-        addMarkers();
-
     }
 
     private void enableLocation(){
@@ -55,11 +58,12 @@ public class DisplayMap extends MapFragment implements LocationListener {
 
             mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, this);
 
-            Location location = mLocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (location != null){
+            Location myLocation = mLocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-                mLatitude = location.getLatitude();
-                mLongitude = location.getLongitude();
+            if (myLocation != null){
+
+                mLatitude = myLocation.getLatitude();
+                mLongitude = myLocation.getLongitude();
 
                 mapLocation();
 
@@ -96,6 +100,7 @@ public class DisplayMap extends MapFragment implements LocationListener {
         super.onResume();
 
         enableLocation();
+        addMarkers();
 
     }
 
@@ -134,11 +139,12 @@ public class DisplayMap extends MapFragment implements LocationListener {
     private void mapLocation(){
 
         GoogleMap map = getMap();
+        map.setOnMapLongClickListener(this);
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLatitude, mLongitude), 10));
 
     }
 
-    private void addMarkers(){
+    public void addMarkers(){
 
         mMap = getMap();
 
@@ -146,24 +152,72 @@ public class DisplayMap extends MapFragment implements LocationListener {
 
             mDataHelper = mEventDetails.get(i);
 
-            mMap.addMarker(new MarkerOptions().position(new LatLng(mDataHelper.getLat(), mDataHelper.getLong())).title(mDataHelper.getName()));
+            Marker map = mMap.addMarker(new MarkerOptions().position(new LatLng(mDataHelper.getLat(), mDataHelper.getLong())).title(mDataHelper.getName()).snippet(mDataHelper.getTime()));
 
-            Log.i("Hi", "Bye");
+            String key = map.getId();
+
+            mapInfo.put(key, mDataHelper);
+
+            mMap.setInfoWindowAdapter(new MarkerAdapter());
+            mMap.setOnInfoWindowClickListener(this);
 
         }
 
     }
 
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+
+        String markerInfo = marker.getId();
+
+        mDataHelper = mapInfo.get(markerInfo);
+
+        Intent display = new Intent(getActivity(), DisplayActivity.class);
+        display.putExtra(EXTRASTRING, mDataHelper);
+        startActivity(display);
+
+        marker.hideInfoWindow();
+
+    }
+
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+
+        mLongitude = latLng.longitude;
+        mLatitude = latLng.latitude;
+
+        ((MainActivity) getActivity()).createNewData();
+
+    }
+
+
     private class MarkerAdapter implements GoogleMap.InfoWindowAdapter{
 
         @Override
         public View getInfoWindow(Marker marker) {
+
             return null;
+
         }
 
         @Override
         public View getInfoContents(Marker marker) {
-            return null;
+
+            View view = getActivity().getLayoutInflater().inflate(R.layout.infowindow, null);
+
+            TextView mTitle = (TextView) view.findViewById(R.id.infoTitle);
+            TextView mDate = (TextView) view.findViewById(R.id.infoDate);
+
+            mEventDetails.get(arrayLocation);
+
+            String title = marker.getTitle();
+            String date = marker.getSnippet();
+
+            mTitle.setText(title);
+            mDate.setText(date);
+
+            return view;
+
         }
 
     }

@@ -86,5 +86,7 @@ public class MyMapFragment extends MapFragment implements OnInfoWindowClickListe
 		public View getInfoWindow(Marker marker) {
 			return null;
 		}
+
 	}
+
 }

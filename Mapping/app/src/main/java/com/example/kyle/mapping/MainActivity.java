@@ -29,6 +29,7 @@ public class MainActivity extends Activity {
 
         DisplayMap frag = new DisplayMap();
         getFragmentManager().beginTransaction().replace(R.id.container, frag).commit();
+
     }
 
     @Override
@@ -52,7 +53,7 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void createNewData(){
+    public void createNewData(){
 
         Intent create = new Intent(this, CreateActivity.class);
         create.putExtra(EXTRASTRING, mEventDetails);

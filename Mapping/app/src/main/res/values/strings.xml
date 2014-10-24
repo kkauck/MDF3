@@ -8,4 +8,6 @@
     <string name="picture">Take Picture</string>
     <string name="save">Save New Event</string>
 
+    <color name="cream">#F5F5DC</color>
+
 </resources>

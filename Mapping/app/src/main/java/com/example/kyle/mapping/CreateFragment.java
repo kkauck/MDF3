@@ -28,8 +28,8 @@ public class CreateFragment extends Fragment {
 
     Uri mImageUri;
     ImageView mCreateImage;
-    double mCreateLat = DisplayMap.mLatitude;
-    double mCreateLong = DisplayMap.mLongitude;
+    double mCreateLat;
+    double mCreateLong;
     private eventDetails mEventDetail;
 
     TextView mName;
@@ -62,6 +62,12 @@ public class CreateFragment extends Fragment {
             throw new IllegalArgumentException("Must Implement This!");
 
         }
+
+    }
+
+    public void setLocation(){
+
+
 
     }
 
@@ -107,8 +113,8 @@ public class CreateFragment extends Fragment {
                 String name = mName.getText().toString();
                 String time = mTime.getText().toString();
                 String image = mImageUri.toString();
-                double latitiude = mCreateLat;
-                double longitude = mCreateLong;
+                double latitiude = DisplayMap.mLatitude;
+                double longitude = DisplayMap.mLongitude;
 
                 mEventDetail.details(name, time, image, latitiude, longitude);
 
